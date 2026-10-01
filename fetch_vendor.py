@@ -12,7 +12,9 @@ import sys
 from pathlib import Path
 
 REPO = 'https://github.com/comfyanonymous/ComfyUI'
-PIN = 'REPLACE-WITH-THE-COMMIT-SHA-YOUR-MING-PR-BASELINE-USES'
+# The merge commit of Comfy-Org/ComfyUI PR #16482 (feat: ming-image support),
+# merged 2026-09-24. This is the backend the extension is built against.
+PIN = '3b4c0b0e457cf0a51cf3038e0a6750d8f96ce251'
 TARGET = Path(__file__).resolve().parent / 'vendor' / 'ComfyUI'
 
 
