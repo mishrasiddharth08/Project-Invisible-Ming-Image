@@ -1,0 +1,14 @@
+NOTICE for project-invisible-ming-image
+
+This extension embeds a pinned checkout of ComfyUI (https://github.com/comfyanonymous/ComfyUI)
+under vendor/ComfyUI for use as a backend library only. ComfyUI is GPL-3.0; its license is at
+vendor/ComfyUI/LICENSE. No ComfyUI interface or server is launched.
+
+Model weights (Ming-Image-0.1-Design, Ling text encoder, VAE) are NOT included in this
+repository. They are downloaded from or pointed at Comfy-Org/Ming-Image /
+inclusionAI/Ming-Image-0.1-Design under their own licenses (MIT for the inclusionAI release).
+Review each model license before use.
+
+This extension integrates with sd-webui-forge-classic (neo branch) by Haoming02.
+It is an independent community project and is not affiliated with inclusionAI, Comfy-Org,
+or the Forge maintainers.

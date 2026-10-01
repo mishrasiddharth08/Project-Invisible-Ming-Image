@@ -1,0 +1,8 @@
+.pi-ming-panel { border-left: 2px solid #8a7cbc; }
+.pi-ming-panel .label-wrap { cursor: pointer; }
+.pi-ming-panel .wrap { gap: 8px; }
+.pi-ming-panel label span, .pi-ming-panel .markdown { font-size: 13px; }
+@media (prefers-reduced-motion: no-preference) {
+  .pi-ming-developing img { animation: pi-ming-reveal .18s ease-in; }
+  @keyframes pi-ming-reveal { from { opacity: .7; } to { opacity: 1; } }
+}
