@@ -144,6 +144,31 @@ Project-Invisible Qwen-Image-2.1 implementation:
 - **Stop** cancels the dedicated worker, including while encoding or decoding.
   It never kills Forge or another extension's process.
 
+## Testing status — read before relying on this release
+
+**This release has not yet been validated on live hardware.** Due to time
+unavailability, no generation run against real Forge Neo, real GPU hardware or
+the real Ming-Image weights has been performed at the time of publishing.
+
+What **has** been verified, from a clean checkout:
+
+- All Python modules compile; the CPU test suite passes
+  (`tests/test_contracts.py`: UI arity contract, config-key passthrough,
+  Spectrum branch separation and off-path behavior).
+- Model catalog hashes match the published `Comfy-Org/Ming-Image` files.
+- The vendored backend pin resolves to the actual ComfyUI PR #16482 merge commit.
+
+What remains **unverified** and expected-but-not-proven:
+
+- A full txt2img and img2img generation against live Forge Neo on CUDA.
+- Spectrum's hook path against the real vendored `final_layer` module layout.
+- ROCm behavior, every quantization format, and every VRAM tier in practice.
+
+If you test it, please report your Forge version, GPU, precision, steps, CFG,
+enabled options and the complete terminal error with any issue. Results from
+real runs will be recorded in `VALIDATION.md` as they arrive. Until then,
+treat this release as a tested-in-principle build, not a field-proven one.
+
 ## Compatibility and honest limits
 
 - NVIDIA CUDA is the tested path. AMD ROCm and CPU depend on backend/kernel
