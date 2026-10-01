@@ -195,6 +195,12 @@ models and generated images are separate and remain available.
 | Stale browser controls | Refresh the browser after restarting Forge. |
 | Need help | Include the complete terminal error, model filenames and settings. |
 
+**For any complaints or concerns, please raise them on GitHub:**
+[open an issue](https://github.com/mishrasiddharth08/Project-Invisible-Ming-Image/issues) —
+include your Forge version, GPU, precision, steps, CFG, enabled options and the
+complete terminal error so the problem can be reproduced. Community discussion
+and testing reports are equally welcome.
+
 ## Credits and licenses
 
 Thanks to inclusionAI, Kijai and Comfy-Org (Ming-Image support, ComfyUI PR
