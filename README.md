@@ -10,6 +10,8 @@ extra virtual environment, ComfyUI server or Forge core fork.**
 
 Select **Ming-Image** under **UI Preset**, then use the normal **Generate** button.
 
+![Generation quickstart](docs/img/usage-steps.svg)
+
 > [!IMPORTANT]
 > Independent community extension. Not an official Ming or inclusionAI product.
 > Model weights are **not** included; downloads require your approval and a
@@ -87,7 +89,13 @@ alone is not proof.
    model's recommended transparent-background phrasing; the PNG is saved with
    alpha. The checkerboard in previews is display only.
 
+## Panel guide
+
+![Where everything lives](docs/img/ui-tour.svg)
+
 ## Edit an image
+
+![Edit flow](docs/img/img2img-flow.svg)
 
 1. Open the existing **img2img** tab and add your photo.
 2. Set **Denoising strength to 1** — this is Ming reference conditioning, not

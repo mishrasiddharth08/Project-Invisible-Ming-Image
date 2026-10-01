@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<title id="title">Edit flow</title><desc id="desc">How an img2img edit is processed, in order, before it reaches the gallery.</desc>
+<rect width="1200" height="720" rx="24" fill="#10151f"/>
+<style>text{font-family:Arial,sans-serif}.title{fill:#e8ecf4;font-size:36px;font-weight:700}.sub{fill:#9fb0c9;font-size:20px}.label{fill:#b3a3d4;font-size:22px;font-weight:700}.body{fill:#dfe7f5;font-size:18px}.small{fill:#9fb0c9;font-size:15px}</style>
+<text x="48" y="70" class="title">How an edit is processed</text>
+<text x="48" y="112" class="sub">img2img only. Denoising strength stays at 1: references condition the model, they are not blended noise.</text>
+<rect x="48" y="160" width="330" height="170" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="70" y="200" class="label">1  Validate</text>
+<text x="70" y="238" class="body">One primary source image</text>
+<text x="70" y="266" class="body">Up to 7 extra references</text>
+<text x="70" y="294" class="small">Masks and hires are rejected up front.</text>
+<rect x="410" y="160" width="330" height="170" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="432" y="200" class="label">2  Condition</text>
+<text x="432" y="238" class="body">Prompt tagged &lt;Picture 1&gt;</text>
+<text x="432" y="266" class="body">References resized to canvas</text>
+<text x="432" y="294" class="small">Seen by the encoder and the DiT.</text>
+<rect x="772" y="160" width="330" height="170" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="794" y="200" class="label">3  Sample</text>
+<text x="794" y="238" class="body">12 steps from pure noise</text>
+<text x="794" y="266" class="body">Live latent previews if enabled</text>
+<text x="794" y="294" class="small">Stop cancels inside any phase.</text>
+<rect x="234" y="400" width="330" height="170" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="256" y="440" class="label">4  Decode</text>
+<text x="256" y="478" class="body">Ming VAE decodes the latent</text>
+<text x="256" y="506" class="body">RGBA kept if requested</text>
+<text x="256" y="534" class="small">Decoding is real progress, not idle.</text>
+<rect x="596" y="400" width="330" height="170" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="618" y="440" class="label">5  Save + show</text>
+<text x="618" y="478" class="body">PNG saved as it is decoded</text>
+<text x="618" y="506" class="body">Infotext records the full setup</text>
+<text x="618" y="534" class="small">A crash never loses finished images.</text>
+<text x="48" y="668" class="sub">Reference size sets the output canvas: the sampled latent matches the first image.</text>
+<text x="48" y="700" fill="#9fb0c9" font-family="Arial,sans-serif" font-size="16">PROJECT INVISIBLE · MING-IMAGE-0.1-DESIGN · OCTOBER 1, 2026</text></svg>

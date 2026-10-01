@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+<title id="title">Panel guide</title><desc id="desc">Everything lives in the normal Forge workflow. The Ming panel appears only for Ming checkpoints.</desc>
+<rect width="1200" height="820" rx="24" fill="#10151f"/>
+<style>text{font-family:Arial,sans-serif}.title{fill:#e8ecf4;font-size:36px;font-weight:700}.sub{fill:#9fb0c9;font-size:20px}.label{fill:#b3a3d4;font-size:22px;font-weight:700}.body{fill:#dfe7f5;font-size:18px}.small{fill:#9fb0c9;font-size:15px}</style>
+<text x="48" y="70" class="title">Where everything lives</text>
+<text x="48" y="112" class="sub">No extra tab. Native preset, checkpoint and Generate. The Ming panel appears only when a Ming checkpoint is selected.</text>
+<rect x="48" y="150" width="540" height="300" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="70" y="192" class="label">Native Forge (unchanged)</text>
+<text x="70" y="232" class="body">UI Preset → Ming-Image</text>
+<text x="70" y="262" class="body">Checkpoint → PROJECT INVISIBLE — Ming-Image</text>
+<text x="70" y="292" class="body">txt2img / img2img / Generate / Stop</text>
+<text x="70" y="322" class="body">Steps, CFG, size, seed, batch, gallery</text>
+<text x="70" y="352" class="small">A checkpoint change away from Ming releases the worker automatically.</text>
+<rect x="612" y="150" width="540" height="300" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="634" y="192" class="label">Ming panel</text>
+<text x="634" y="232" class="body">Models — setup guide and download links</text>
+<text x="634" y="262" class="body">Speed — Spectrum acceleration (off by default)</text>
+<text x="634" y="292" class="body">Optional — RGBA, memory mode, keep loaded</text>
+<text x="634" y="322" class="body">LoRA dropdown and strength slider</text>
+<text x="634" y="352" class="small">img2img only: Extra reference images, slots 2–8.</text>
+<rect x="48" y="480" width="1104" height="240" rx="14" fill="#1b2230" stroke="#4a3c63"/>
+<text x="70" y="522" class="label">What the engine ignores, stated plainly</text>
+<text x="70" y="562" class="body">Hires fix, inpainting masks, face restore, tiling, variation seeds and seed resize are rejected with instructions — never silently ignored.</text>
+<text x="70" y="592" class="body">Sampler and scheduler dropdowns map onto the backend's flow samplers; unsupported values fall back with a console note.</text>
+<text x="70" y="622" class="body">Denoising strength in img2img must be 1: Ming uses reference conditioning, not SD noise blending.</text>
+<text x="70" y="652" class="small">Every rejection is one clear line, not a broken image.</text>
+<text x="48" y="780" fill="#9fb0c9" font-family="Arial,sans-serif" font-size="16">PROJECT INVISIBLE · MING-IMAGE-0.1-DESIGN · OCTOBER 1, 2026</text></svg>
