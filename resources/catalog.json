@@ -2,15 +2,15 @@
   "repo": "Comfy-Org/Ming-Image",
   "revision": "main",
   "files": [
-    {"filename": "diffusion_models/ming_image_0.1_design_bf16.safetensors", "size": 12309858664, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "diffusion_models/ming_image_0.1_design_int8_convrot.safetensors", "size": 6175239953, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "diffusion_models/ming_image_0.1_design_layer_bf16.safetensors", "size": 12309874192, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "diffusion_models/ming_image_0.1_design_layer_int8_convrot.safetensors", "size": 6175255481, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_bf16.safetensors", "size": 36677768245, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_int8_convrot.safetensors", "size": 19507670525, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_layer_bf16.safetensors", "size": 36677768245, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_layer_int8_convrot.safetensors", "size": 19507670525, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_w4a8.safetensors", "size": 12813574339, "sha256": "PENDING-VERIFY-BEFORE-SHIP"},
-    {"filename": "vae/ming_image_vae_bf16.safetensors", "size": 253816696, "sha256": "PENDING-VERIFY-BEFORE-SHIP"}
+    {"filename": "diffusion_models/ming_image_0.1_design_bf16.safetensors", "size": 12309858664, "sha256": "8781c6fc679f1812ad318cc7fd84c4d05a23b3571b9a7efeff73a92054ef4659"},
+    {"filename": "diffusion_models/ming_image_0.1_design_int8_convrot.safetensors", "size": 6175239953, "sha256": "0d3f5bcc6d2cb830578ea6d0925b30b9fb66058bcb651cc8633e60760dceb1d0"},
+    {"filename": "diffusion_models/ming_image_0.1_design_layer_bf16.safetensors", "size": 12309874192, "sha256": "31c588e279f0dd461d3366ae7e21b4a0f6926fbc8b5a1f6580ab899a761be34a"},
+    {"filename": "diffusion_models/ming_image_0.1_design_layer_int8_convrot.safetensors", "size": 6175255481, "sha256": "ef3f306c7981ac477f1fc28693144338ea35fb3f17cb0954c570553f53727a92"},
+    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_bf16.safetensors", "size": 36677768245, "sha256": "7eccad21934f2e6d9103b5c589a448082e89f7b5b73a6b9c6d0332be7de26c1e"},
+    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_int8_convrot.safetensors", "size": 19507670525, "sha256": "9d9f31cfce37c24ae1589287f5c33bd9dda80e14ddf773b5e17a0bb69c8cc4b1"},
+    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_layer_bf16.safetensors", "size": 36677768245, "sha256": "09c1474738712b275fc0ed4e77f534196fe6ed676655428c865b552b48cf157a"},
+    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_layer_int8_convrot.safetensors", "size": 19507670525, "sha256": "086324b766a04844dc918866e48e40b5cede499d869ac3fa05ceaa87ad7c6850"},
+    {"filename": "text_encoders/ming_image_0.1_ling_mini_2.0_w4a8.safetensors", "size": 12813574339, "sha256": "91de4cd0718bec1452b74ff3b0df0dfde280493dab384f0eb4007c18bf932ccd"},
+    {"filename": "vae/ming_image_vae_bf16.safetensors", "size": 253816696, "sha256": "7f5bed402dc8c77dc2e0ab1929a85d4df433b7cf7b599dfa8c353da98db0b90a"}
   ]
 }
