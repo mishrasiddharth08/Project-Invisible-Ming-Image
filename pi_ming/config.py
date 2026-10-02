@@ -7,7 +7,7 @@ PRESET = 'Ming-Image'
 
 
 def settings():
-    defaults = {'model_roots': [], 'preview_interval': 1.0, 'keep_loaded': False}
+    defaults = {'model_roots': [], 'preview_interval': 1.0}
     path = ROOT / 'config.json'
     if path.exists():
         defaults.update(json.loads(path.read_text(encoding='utf-8')))

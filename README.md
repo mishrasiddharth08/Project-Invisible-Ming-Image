@@ -112,37 +112,33 @@ prompt tags. Only adapter keys matching the Ming model are accepted; adapters
 are applied as a removable runtime patch (never merged into quantized weights)
 and unpatched after each image. Non-Ming adapters are rejected.
 
-## Speed — Spectrum
+## Speed, LoRAs and memory
 
-Optional approximate CFG acceleration in **Ming → Speed**, ported from the
-Project-Invisible Qwen-Image-2.1 implementation:
+Speed comes from Forge Neo's built-in **Spectrum** extension
+(*Spectrum Integrated* accordion). When it is enabled for a generation, this
+extension reads its settings and applies the **same** `SpectrumNode.patch` to
+the backend's sampler — the identical algorithm, no fork. At CFG 1 Spectrum
+has no second pass to skip; results depend on its own settings.
 
-- Separate cond/uncond prediction histories, warmup and final steps reserved
-  for real work, stride 3, and a magnitude guard that falls back to real
-  computation whenever a forecast is untrustworthy.
-- **At CFG 1 it does nothing by design** (there is no uncond pass to skip).
-- Off by default — the safe setting, not the fastest. PNG metadata records
-  real and forecast pass counts.
-
-## Hardware and quantization
-
-- **NVIDIA CUDA** is the tested path on **6, 8, 12, 16, 20, 24 and 32 GB**
-  cards. Memory mode **auto** reads your actual card and stages offload
-  accordingly; Forge's own models are unloaded before each request.
-- **AMD ROCm** works with BF16 weights; packed int8_convrot / w4a8 kernels are
-  not verified there and are never chosen automatically. DirectML is not supported.
-- Format selection is per-tier; your explicit dropdown choice always wins.
-  See [QUANTIZATION.md](QUANTIZATION.md) for the full matrix.
+- **LoRAs**: use `<lora:filename:strength>` tags in the prompt box. Only
+  adapter keys matching the Ming model are accepted, applied as a removable
+  runtime patch (never merged into quantized weights).
+- **Memory**: automatic. The worker reads the actual GPU and stages offload
+  per VRAM tier (6–32 GB NVIDIA, BF16 on ROCm/CPU). Forge's own models are
+  unloaded before each request, and model reuse follows Forge's standard
+  lifecycle, as with every built-in engine — no keep-loaded switch.
+- **RGBA**: tick the checkbox and phrase the prompt with the model's
+  recommended transparent-background phrasing; the PNG is saved with alpha.
+- **img2img only**: "Extra reference images" — 7 image slots (Reference 2–8)
+  for multi-image editing.
 
 ## Progress and memory
 
 - Exactly two bars: **current image** plus Forge's **overall batch** bar.
 - Enable Forge's **Live previews** for approximate latent previews.
-- By default the worker releases memory after each request; **Keep model in
-  memory** permits reuse between runs. Selecting another preset always stops
-  this extension's active job and releases its worker.
-- **Stop** cancels the dedicated worker, including while encoding or decoding.
-  It never kills Forge or another extension's process.
+- Selecting another preset stops this extension's active job and releases
+  its worker. **Stop** cancels the dedicated worker, including while encoding
+  or decoding; it never kills Forge or another extension's process.
 
 ## Testing status — read before relying on this release
 

@@ -88,7 +88,7 @@ class Worker:
         while True:
             event = self.receive(cancelled)
             if event['type'] == 'result':
-                return event['path'], event.get('rgba', False), event.get('spectrum') or {}
+                return event['path'], event.get('rgba', False)
             update(event)
 
     def close(self):

@@ -69,8 +69,6 @@ def generate(p, options):
                 if editing and '<Picture ' not in prompt and refs:
                     prompt = '<Picture 1> ' + prompt
                 adapters = []
-                if options.get('lora') not in (None, '', '(none)'):
-                    tags.append((options['lora'], float(options.get('strength', 1.0))))
                 for name, strength in tags:
                     matches = [path for path in inventory['lora'] if path == name or Path(path).stem == name]
                     if len(matches) != 1:
@@ -78,9 +76,8 @@ def generate(p, options):
                     header(matches[0])
                     adapters.append({'path': matches[0], 'strength': strength})
                 seed = (int(p.seed) + index) % (2**63)
-                mode = options.get('memory', 'auto')
-                if mode not in ('auto', 'lowvram', 'cpu'):
-                    raise ValueError('Invalid Ming memory mode.')
+                # Memory mode is automatic: the worker reads the actual card and
+                # stages offload per VRAM tier. No user-facing mode selector.
                 progress.start(index, p.width, p.height)
                 try:
                     from backend import memory_management
@@ -88,9 +85,9 @@ def generate(p, options):
                     raise RuntimeError('Forge memory interface changed; Ming-Image cannot safely load. Update the extension.') from error
                 # Free Forge-side checkpoint/TE/VAE residency before every request; the worker owns the GPU.
                 memory_management.unload_all_models()
-                if _worker is None or _worker.mode != mode or _worker.process.poll() is not None:
+                if _worker is None or _worker.process.poll() is not None:
                     release()
-                    _worker = Worker(mode)
+                    _worker = Worker('auto')
                     _worker.wait_ready(cancelled)
                 worker = _worker
                 with tempfile.TemporaryDirectory(prefix='pi-ming-') as temporary:
@@ -105,10 +102,9 @@ def generate(p, options):
                         adapters=adapters, seed=seed, width=int(p.width), height=int(p.height), steps=int(p.steps),
                         cfg=float(p.cfg_scale), sampler=sampler, scheduler=scheduler, preview=progress.preview,
                         preview_interval=max(1.0, float(settings()['preview_interval'])), rgba=rgba,
-                        spectrum=bool(options.get('spectrum', False)),
                         output=str(Path(temporary)/'result.png'))
                     try:
-                        result_path, result_rgba, spectrum_stats = worker.generate(request, cancelled, progress.update)
+                        result_path, result_rgba = worker.generate(request, cancelled, progress.update)
                     except (InterruptedError, RuntimeError, OSError):
                         if not cancelled():
                             raise
@@ -121,16 +117,11 @@ def generate(p, options):
                 if result.size != (p.width, p.height):
                     raise RuntimeError('Ming returned incorrect dimensions; output was not saved.')
                 progress.finish(result)
-                spectrum_note = ''
-                if spectrum_stats.get('reason') == 'active':
-                    spectrum_note = f", Spectrum: {spectrum_stats['actual']} real + {spectrum_stats['forecast']} forecast passes"
-                elif spectrum_stats.get('reason') == 'cfg_1_no_uncond':
-                    spectrum_note = ', Spectrum: off (CFG 1 has no uncond pass)'
                 info = (f'{prompt}\nNegative prompt: {negative}\nSteps: {p.steps}, Sampler: {p.sampler_name}, '
                         f'Schedule type: {scheduler}, CFG scale: {p.cfg_scale}, Seed: {seed}, Size: {p.width}x{p.height}, '
                         f'Model: {Path(paths["dit"]).name}, Ming encoder: {Path(paths["clip"]).name}, '
                         f'Ming VAE: {Path(paths["vae"]).name}, Ming references: {len(refs)}, '
-                        f'Ming RGBA: {result_rgba}, Ming adapters: {adapters}{spectrum_note}')
+                        f'Ming RGBA: {result_rgba}, Ming adapters: {adapters}')
                 p.sd_model_name = Path(paths['dit']).stem
                 p.sd_vae_name = Path(paths['vae']).stem
                 p.extra_generation_params.update({'Ming references': len(refs), 'Ming RGBA': result_rgba})
@@ -153,5 +144,8 @@ def generate(p, options):
             raise
         finally:
             progress.close()
-            if not options.get('keep_loaded', False) or cancelled():
+            # Model reuse follows Forge's standard lifecycle, as with every
+            # built-in engine: the worker stays alive while the preset stays
+            # selected and is released on selection change or failure.
+            if cancelled():
                 release()

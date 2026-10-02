@@ -1,100 +1,69 @@
-"""Regression record: UI arity contract + Spectrum branch separation.
+"""Regression record: UI arity contract + wiring contracts.
 
 Defects covered:
 - engine.py's ui() return list and pi_ming.forge.KEYS are positionally coupled
   (prompt rule 64); a component added on one side alone shifts every field
   after it. This test parses both from source so it cannot drift silently.
-- Spectrum originally mixed cond/uncond forward passes into one history
-  (prompt rule 70: never feed an approximation back in as an anchor). The two
-  branches have different feature statistics; the fit must be per-branch.
+- Config-derived keys must never disappear on the UI path (prompt rule 63).
+- The centralized Spectrum contract: the Forge side must read the central
+  sd_forge_spectrum script's settings and pass its lib path; the worker must
+  apply the central SpectrumNode.patch verbatim. No forked forecaster exists
+  in this extension.
 """
 import re
 import sys
-import types
-
-import torch
 
 ROOT = __file__.rsplit('tests', 1)[0]
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from pi_ming import spectrum
-
 
 def test_arity_contract():
     engine = open(ROOT + 'scripts/engine.py', encoding='utf-8').read()
     forge = open(ROOT + 'pi_ming/forge.py', encoding='utf-8').read()
-    assert re.search(r'return \[rgba, memory, keep, lora, strength, spectrum, \*refs\]', engine), \
+    assert re.search(r'return \[rgba, \*refs\]', engine), \
         'engine.py return order changed; update pi_ming.forge.KEYS in lockstep'
     keys = re.search(r"KEYS = \(([^)]*)\)", forge).group(1)
     names = [k.strip().strip("'\"") for k in keys.split(',') if k.strip()]
-    assert names == ['rgba', 'memory', 'keep_loaded', 'lora', 'strength', 'spectrum'], names
+    assert names == ['rgba'], names
     assert 'REF_COUNT = 7' in forge, 'reference slot count must match engine.py refs 2..8'
 
 
 def test_config_passthrough():
     runtime = open(ROOT + 'pi_ming/runtime.py', encoding='utf-8').read()
     config = open(ROOT + 'pi_ming/config.py', encoding='utf-8').read()
-    for key in ('preview_interval', 'keep_loaded', 'model_roots'):
+    for key in ('preview_interval', 'model_roots'):
         assert key in runtime or key in config, f'config-derived key {key} dropped on the UI path'
 
 
-class _Diff:
-    pass
+def test_central_spectrum_contract():
+    forge = open(ROOT + 'pi_ming/forge.py', encoding='utf-8').read()
+    worker = open(ROOT + 'pi_ming/worker.py', encoding='utf-8').read()
+    engine = open(ROOT + 'scripts/engine.py', encoding='utf-8').read()
+    # The Forge side reads the central script, not a checkbox of its own.
+    assert "SPECTRUM_TITLE = 'Spectrum Integrated'" in forge
+    assert "from lib_spectrum.forecaster import SpectrumNode" in worker
+    assert "SpectrumNode.patch(model" in worker
+    # No forked forecaster ships in this extension.
+    import os
+    assert not os.path.exists(ROOT + 'pi_ming/spectrum.py'), 'forked Spectrum must not exist'
+    # The panel points users at the central extension, not a local toggle.
+    assert 'Spectrum extension' in engine
+    assert 'spectrum' not in [k.strip().strip("'\"") for k in
+        re.search(r"KEYS = \(([^)]*)\)", forge).group(1).split(',')]
 
 
-class _Model:
-    pass
-
-
-class FinalLayer:
-    def forward(self, x):
-        return x * 2.0
-
-
-def test_spectrum_branch_separation():
-    patcher = _Model()
-    patcher.model = _Model()
-    patcher.model.diffusion_model = _Diff()
-    fl = FinalLayer()
-    patcher.model.diffusion_model.final_layer = fl
-
-    stats = {}
-    with spectrum.accelerate(patcher, enabled=True, steps=20, cfg=4.0, stats=stats):
-        assert stats['reason'] == 'active', stats
-        wrapped = fl.forward
-        # Alternate cond (large) / uncond (small) features for 20 steps x 2.
-        for i in range(40):
-            value = 10.0 if i % 2 == 0 else -10.0
-            wrapped(torch.full((1, 4), value))
-        assert stats['actual'] + stats['forecast'] == 40, stats
-    # After the context, the original method is restored exactly.
-    assert fl.forward is FinalLayer.forward or (
-        isinstance(fl.forward, types.MethodType) and fl.forward.__func__ is FinalLayer.forward)
-
-
-def test_spectrum_off_paths():
-    patcher = _Model()
-    patcher.model = _Model()
-    patcher.model.diffusion_model = _Diff()
-    patcher.model.diffusion_model.final_layer = FinalLayer()
-    stats = {}
-    with spectrum.accelerate(patcher, enabled=False, steps=20, cfg=4.0, stats=stats):
-        pass
-    assert stats['reason'] == 'disabled', stats
-    stats = {}
-    with spectrum.accelerate(patcher, enabled=True, steps=12, cfg=1.0, stats=stats):
-        pass
-    assert stats['reason'] == 'cfg_1_no_uncond', stats
-    stats = {}
-    with spectrum.accelerate(patcher, enabled=True, steps=6, cfg=4.0, stats=stats):
-        pass
-    assert stats['reason'] == 'too_few_steps', stats
+def test_minimal_panel():
+    engine = open(ROOT + 'scripts/engine.py', encoding='utf-8').read()
+    assert 'Models' not in engine, 'Models accordion removed by design; downloads point at HuggingFace'
+    assert "gr.Dropdown" not in engine, 'no LoRA dropdown: prompt tags are the interface'
+    assert 'Keep model in memory' not in engine, 'reuse follows Forge lifecycle, not a checkbox'
+    assert 'Memory mode' not in engine, 'memory mode is automatic'
 
 
 if __name__ == '__main__':
     test_arity_contract()
     test_config_passthrough()
-    test_spectrum_branch_separation()
-    test_spectrum_off_paths()
+    test_central_spectrum_contract()
+    test_minimal_panel()
     print('all tests passed')

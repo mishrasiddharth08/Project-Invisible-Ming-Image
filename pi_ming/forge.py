@@ -1,11 +1,12 @@
 from pathlib import Path
+import sys
 import threading
 from .config import ROOT, LABEL, PRESET
 from . import runtime
 from .assets import classify, scan
 
 # Must match scripts/engine.py ui() return order exactly.
-KEYS = ('rgba', 'memory', 'keep_loaded', 'lora', 'strength', 'spectrum')
+KEYS = ('rgba',)
 REF_COUNT = 7
 _UI_BINDINGS = []
 _selection_state = threading.local()
@@ -64,6 +65,33 @@ def register():
     ci.register()
 
 
+SPECTRUM_TITLE = 'Spectrum Integrated'
+SPECTRUM_ARGS = 8  # enable, w, m, lam, window_size, flex_window, warmup, stop
+
+
+def spectrum_settings(runner, p):
+    """Read the centralized sd_forge_spectrum script's settings from this job.
+
+    Ming bypasses the stock pipeline, so the central extension's
+    process_before_every_sampling never fires; its settings are honored here
+    instead and applied to the worker's ComfyUI patcher verbatim.
+    """
+    for script in getattr(runner, 'alwayson_scripts', []) or []:
+        try:
+            title = script.title()
+        except Exception:
+            continue
+        if title != SPECTRUM_TITLE:
+            continue
+        values = list(getattr(p, 'script_args', []) or [])[script.args_from:script.args_to]
+        if len(values) < SPECTRUM_ARGS or not values[0]:
+            return None
+        module_path = getattr(sys.modules.get(script.__class__.__module__, None), '__file__', None)
+        lib = str(Path(module_path).parent.parent / 'lib_spectrum') if module_path else None
+        return {'args': [float(v) if i in (1, 2, 3, 5, 7) else int(v) for i, v in enumerate(values[1:SPECTRUM_ARGS], start=1)], 'path': lib}
+    return None
+
+
 def options(runner, p):
     result = {}
     for script in getattr(runner, 'alwayson_scripts', []) or []:
@@ -71,6 +99,9 @@ def options(runner, p):
             values = list(getattr(p, 'script_args', []) or [])[script.args_from:script.args_to]
             result = {**dict(zip(KEYS, values[:len(KEYS)])), 'refs': values[len(KEYS):len(KEYS)+REF_COUNT]}
             break
+    spectrum = spectrum_settings(runner, p)
+    if spectrum:
+        result['spectrum'] = spectrum
     from modules import shared, sd_models
     value = (getattr(p, 'override_settings', {}) or {}).get('sd_model_checkpoint', shared.opts.sd_model_checkpoint)
     item = sd_models.checkpoints_list.get(value) or sd_models.checkpoint_aliases.get(value)

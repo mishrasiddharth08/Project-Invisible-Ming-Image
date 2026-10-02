@@ -190,7 +190,6 @@ class Engine:
         import comfy.sd
         import comfy.sample
         import comfy.model_management as mm
-        from . import spectrum
         self.load(request['paths'])
         width, height = request['width'], request['height']
         model = self.model
@@ -225,10 +224,24 @@ class Engine:
                     last_preview = now
                 emit('progress', **data)
             emit('status', text='sampling')
-            stats = {'actual': 0, 'forecast': 0, 'reason': 'disabled'}
-            with torch.inference_mode(), spectrum.accelerate(model, enabled=bool(request.get('spectrum')),
-                    steps=int(request['steps']), cfg=float(request['cfg']), stats=stats) as spectrum_stats:
-                output = comfy.sample.sample(model, noise, request['steps'], request['cfg'], request['sampler'],
+            # Centralized Spectrum: when the sd_forge_spectrum extension is
+            # enabled for this job, its exact SpectrumNode.patch is applied to
+            # the ComfyUI patcher here (Ming bypasses the stock pipeline where
+            # the central script normally hooks). The lib path is resolved by
+            # the Forge side from the central extension itself — no fork.
+            sampler_model = model
+            spectrum_lib = request.get('spectrum')
+            if spectrum_lib and spectrum_lib.get('path') and spectrum_lib['path'] not in sys.path:
+                sys.path.append(spectrum_lib['path'])
+            if spectrum_lib:
+                try:
+                    from lib_spectrum.forecaster import SpectrumNode
+                    sampler_model = SpectrumNode.patch(model, int(request['steps']), *spectrum_lib['args'])
+                except Exception as error:
+                    print('[Ming] Central Spectrum unavailable, running unaccelerated:', error, file=sys.stderr)
+                    sampler_model = model
+            with torch.inference_mode():
+                output = comfy.sample.sample(sampler_model, noise, request['steps'], request['cfg'], request['sampler'],
                     request['scheduler'], positive, negative, latent, callback=callback,
                     disable_pbar=True, seed=request['seed'])
                 emit('status', text='decoding final image')
@@ -242,7 +255,7 @@ class Engine:
                     Image.fromarray((pixels.transpose(1, 2, 0) * 255).round().astype('uint8'), mode='RGBA').save(request['output'])
                 else:
                     Image.fromarray((pixels[:3].transpose(1, 2, 0) * 255).round().astype('uint8'), mode='RGB').save(request['output'])
-                emit('result', path=request['output'], rgba=bool(alpha), spectrum=stats)
+                emit('result', path=request['output'], rgba=bool(alpha))
         finally:
             if candidate is not None:
                 candidate.unpatch_model()

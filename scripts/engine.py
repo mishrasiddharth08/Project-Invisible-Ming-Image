@@ -1,4 +1,10 @@
-"""Normal checkpoint dropdown + Generate. No selectable script or additional tab."""
+"""Normal checkpoint dropdown + Generate. No selectable script or additional tab.
+
+The Ming panel is deliberately minimal: Forge's own Spectrum extension
+(extensions-builtin/sd_forge_spectrum) accelerates sampling when enabled,
+LoRAs come from <lora:...> prompt tags, memory decisions are automatic, and
+model reuse follows Forge's standard model lifecycle.
+"""
 from pathlib import Path
 import sys
 
@@ -25,26 +31,14 @@ try:
         def ui(self, is_img2img):
             prefix = 'ming_img2img' if is_img2img else 'ming_txt2img'
             with gr.Accordion('Ming', open=False, visible=False, elem_id=prefix) as panel:
-                with gr.Accordion('Models', open=False):
-                    gr.Markdown(
-                        'Put the Ming-Image DiT, Ling text encoder and VAE in `models/Ming-Image` '
-                        '(or `diffusion_models` / `text_encoders` / `VAE`). '
-                        'Downloads: [Comfy-Org/Ming-Image](https://huggingface.co/Comfy-Org/Ming-Image). '
-                        'Read the model license before downloading.')
-                with gr.Accordion('Speed', open=False):
-                    spectrum = gr.Checkbox(label='Spectrum acceleration', value=False,
-                                           info='Approximate CFG pass prediction. Real gains at CFG above 1; '
-                                                'at CFG 1 there is nothing to skip. Turn off for an exact baseline.')
-                with gr.Accordion('Optional settings', open=False):
-                    rgba = gr.Checkbox(label='RGBA (transparent background)', value=False,
-                                       info='Save RGBA output when the prompt requests a transparent background.')
-                    memory = gr.Dropdown(label='Memory mode', choices=['auto', 'lowvram', 'cpu'], value='auto',
-                                         info='lowvram reduces GPU residency; cpu is a slow fallback.')
-                    keep = gr.Checkbox(label='Keep model in memory', value=False,
-                                       info='Reuse the worker between runs. Selecting another preset releases it.')
-                    lora = gr.Dropdown(label='LoRA', choices=['(none)'], value='(none)', allow_custom_value=True,
-                                       info='Or use <lora:filename:strength> prompt tags.')
-                    strength = gr.Slider(label='LoRA strength', minimum=-2.0, maximum=2.0, step=0.01, value=1.0)
+                gr.Markdown(
+                    'Ming-Image runs with the native controls: 1024/2048 square, '
+                    '12 steps, CFG 1.0 recommended. Use `<lora:filename:strength>` '
+                    'in the prompt for LoRAs, and Forge\'s Spectrum extension for '
+                    'acceleration. RGBA output follows the prompt\'s '
+                    'transparent-background phrasing.')
+                rgba = gr.Checkbox(label='RGBA (transparent background)', value=False,
+                                   info='Save RGBA output when the prompt requests a transparent background.')
                 refs = []
                 if is_img2img:
                     with gr.Accordion('Extra reference images', open=False):
@@ -52,7 +46,7 @@ try:
                             refs.append(gr.Image(label=f'Reference {n}', type='pil', interactive=True))
             forge.register_ui_binding(panel, is_img2img)
             # Order must match pi_ming.forge.KEYS exactly, then reference images.
-            return [rgba, memory, keep, lora, strength, spectrum, *refs]
+            return [rgba, *refs]
 
     forge.install()
     install_preset()
